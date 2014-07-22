@@ -5,12 +5,14 @@ class Post {
 	private $name = NULL;
 	private $password = NULL;
 	
+	/*
 	$stmt = $dbh->prepare("SELECT name FROM users WHERE id = :user_id");
 	$stmt->bindParam(':user_id', $id, PDO::PARAM_INT);
 	$stmt->execute();
-	$result = $stmt->fetch(); 
+	$result = $stmt->fetch();
+	*/
 
-	public function __construct(Config $config, Database $dbh) {
+	public function __construct(Config $config, PDO $dbh) {
 		$this->config = $config;
 		$this->dbh = $dbh;
 	}

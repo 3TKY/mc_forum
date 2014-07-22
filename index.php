@@ -4,6 +4,7 @@ session_start();
 require_once('includes/class-config.php');
 require_once('includes/class-db.php');
 require_once('includes/class-post.php');
+require_once('includes/class-user.php');
 
 $config = new Config;
 $db = new Database($config);
