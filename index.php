@@ -1,3 +1,4 @@
+<pre>
 <?php
 session_start();
 
@@ -5,6 +6,7 @@ require_once('includes/class-config.php');
 require_once('includes/class-db.php');
 require_once('includes/class-post.php');
 require_once('includes/class-user.php');
+require_once('includes/class-functions.php');
 
 $config = new Config;
 $db = new Database($config);
@@ -22,3 +24,4 @@ $user = new User($config, $dbh);
 
 	</body>
 </html>
+</pre>

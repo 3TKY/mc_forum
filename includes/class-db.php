@@ -15,7 +15,6 @@ class Database {
 			$dbh = new PDO('mysql:host=' . $db_host . ';dbname=' . $db_name, $db_user, $db_password);
 			return $dbh;
 		} catch (Exception $e) {
-			echo 'Could not connect to the database.';
 			error_log($e->getMessage());
 		}
 	}
