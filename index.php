@@ -11,8 +11,6 @@ require_once('includes/class-functions.php');
 $config = new Config;
 $db = new Database($config);
 $dbh = $db->connect();
-$post = new Post($config, $dbh);
-$user = new User($config, $dbh);
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $config->getLanguage(); ?>">
@@ -21,7 +19,15 @@ $user = new User($config, $dbh);
 		<title><?php echo $config->getTitle(); ?></title>
 	</head>
 	<body>
-
+		<h1>Test file</h1>
+		<?php
+		$user = new User($config, $dbh);
+		$user->name = 'Xorvian';
+		$user->password = 'geen';
+		$user->email = 'hoi@hoi.nl';
+		print_r($user);
+		$user->register();
+		?>
 	</body>
 </html>
 </pre>
