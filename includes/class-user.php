@@ -12,11 +12,62 @@ class User {
 	private $logged_in;
 
 	public function register() {
-		$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
+		$user_exists = $this->userExists($this->name, $this->email);
+
+		print_r($user_exists);
+
+		if (!$user_exists['name'] && !$user_exists['email']) {
+			/*
+			$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
+			$stmt->bindParam(':name', $this->name);
+			$stmt->bindParam(':password', $this->password);
+			$stmt->bindParam(':email', $this->email);
+			$stmt->execute();
+			*/
+
+			$email_valid = filter_var($this->email, FILTER_VALIDATE_EMAIL);
+			$name_valid = ;
+
+
+
+		} else {
+			if ($user_exists['name']) {
+			
+			}
+			if ($user_exists['email']) {
+			
+			}
+		}
+
+		/*$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
 		$stmt->bindParam(':name', $this->name);
 		$stmt->bindParam(':password', $this->password);
 		$stmt->bindParam(':email', $this->email);
-		$stmt->execute();
+		$stmt->execute();*/
+	}
+
+	public function userExists($name = NULL, $email = NULL) {
+		$name_exists;
+		$email_exists;
+
+		if ($name) {
+			$stmt = $this->dbh->prepare("SELECT COUNT(*) AS num FROM users WHERE name = :name");
+			$stmt->bindParam(':name', $this->name);
+			$stmt->execute();
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+			$name_exists = $result['num'];
+		}
+
+		if ($email) {
+			$stmt = $this->dbh->prepare("SELECT COUNT(*) AS num FROM users WHERE email = :email");
+			$stmt->bindParam(':email', $this->email);
+			$stmt->execute();
+			$result = $stmt->fetch(PDO::FETCH_ASSOC);
+			$email_exists = $result['num'];
+		}
+
+		$user_exists = array('name' => $name_exists, 'email' => $email_exists);
+		return $user_exists;
 	}
 
 	public function login() {
@@ -53,9 +104,7 @@ class User {
 	}
 
 	public function getName() {
-		if ($this->name) {
-			return $this->name;
-		} elseif ($this->user_id) {
+		if ($this->user_id) {
 			$stmt = $this->dbh->prepare("SELECT name FROM users WHERE id = :user_id");
 			$stmt->bindParam(':user_id', $this->user_id, PDO::PARAM_INT);
 			$stmt->execute();

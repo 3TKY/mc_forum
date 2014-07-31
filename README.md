@@ -1,4 +1,4 @@
-microboard
+mc_forum
 ==========
 
-Simple forum software for communication within a small group
+Simple forum software for communication between members of a Minecraft server

@@ -1,4 +1,3 @@
-<pre>
 <?php
 session_start();
 
@@ -20,6 +19,7 @@ $dbh = $db->connect();
 	</head>
 	<body>
 		<h1>Test file</h1>
+		<pre>
 		<?php
 		$user = new User($config, $dbh);
 		$user->name = 'Xorvian';
@@ -28,6 +28,6 @@ $dbh = $db->connect();
 		print_r($user);
 		$user->register();
 		?>
+		</pre>
 	</body>
 </html>
-</pre>
