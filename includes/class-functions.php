@@ -21,5 +21,9 @@ class Functions {
 			return $elapsed . $units[$unit] . ' ago';
 		}
 	}
+
+	public function saltPassword($password, $alg = 'sha256') {
+		
+	}
 }
 ?>

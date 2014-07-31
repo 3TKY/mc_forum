@@ -1,7 +1,5 @@
 <?php
-require_once('includes/class-config.php');
-require_once('includes/class-db.php');
-require_once('includes/class-user.php');
+require_once('includes/init.php');
 
 $config = new Config;
 $db = new Database($config);

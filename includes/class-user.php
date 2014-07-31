@@ -10,8 +10,6 @@ class User {
 	private $last_login;
 	private $password_hashed;
 
-	private $logged_in;
-
 	public function register() {
 		//Error array
 		$e = [];
@@ -26,7 +24,7 @@ class User {
 				/*
 				$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
 				$stmt->bindParam(':name', $this->name);
-				$stmt->bindParam(':password', $this->password);
+				$stmt->bindParam(':password', $this->password_hashed);
 				$stmt->bindParam(':email', $this->email);
 				$stmt->execute();
 				*/
@@ -101,6 +99,10 @@ class User {
 		$input_valid = array('name' => $name_valid, 'email' => $email_valid, 'password' => $password_valid);
 
 		return $input_valid;
+	}
+
+	public function isLoggedIn() {
+		
 	}
 
 	//Get name from user id
