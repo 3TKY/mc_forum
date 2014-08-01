@@ -2,6 +2,7 @@
 class User {
 	private $config;
 	private $dbh;
+	private $functions;
 
 	public $name;
 	public $password;
@@ -21,14 +22,18 @@ class User {
 			
 			//Validate register form input
 			if($input_valid['name'] && $input_valid['email'] && $input_valid['password']) {
-				/*
+				//Hash password for secure storage
+				$salt = $this->getSalt();
+				$this->password_hashed = $this->hashPassword($this->password, $salt);
+
+				//Inser user database record
 				$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
 				$stmt->bindParam(':name', $this->name);
 				$stmt->bindParam(':password', $this->password_hashed);
 				$stmt->bindParam(':email', $this->email);
 				$stmt->execute();
-				*/
-				echo 'user valid';
+
+				echo 'User registered:' . print_r($this);
 			} else {
 				if (!$input_valid['name']) {
 					//Invalid name error
@@ -54,12 +59,18 @@ class User {
 	}
 
 	public function login() {
-		if ($this->logged_in) {
+		return $this->checkCredentials($this->name, $this->password);
+		return $this->checkCredentials($this->email, $this->password);
+		if ($this->isLoggedIn()) {
 			//User was already logged in
 		} elseif ($this->checkCredentials($this->name, $this->password)) {
-			
+			//Login
+			echo 'login';
+		} elseif (!$this->name || $this->password) {
+			echo 'nodata';
 		} else {
 			//Wrong username or password error
+			'error';
 		}
 	}
 
@@ -77,15 +88,37 @@ class User {
 		
 	}
 
-	private function checkCredentials($username, $password) {
-		//Check if username and password match
-		if (1) {
+	private function checkCredentials($identifier, $password) {
+		$stmt = $this->dbh->prepare("SELECT password FROM users WHERE name = :name OR email = :email");
+		$stmt->bindParam(':name', $identifier);
+		$stmt->bindParam(':email', $identifier);
+		$stmt->execute();
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		
+		$hash = $result['password'];
+
+		$password_hashed = $this->hashPassword($password, $hash);
+
+		if ($password_hashed == $hash) {
 			//Correct username or password
 			return TRUE;
-		} else {
-			//Wrong username or password
-			return FALSE;
 		}
+
+		return FALSE;
+	}
+
+	private function getSalt() {
+		$rand = str_replace('+', 'x', base64_encode(mcrypt_create_iv(32,MCRYPT_DEV_URANDOM)));
+		$prefix = '$2a$07$';
+
+		$salt = $prefix . $rand . '$';
+	
+		return $salt;
+	}
+
+	private function hashPassword($password, $salt) {
+		$hash = crypt($password, $salt);
+		return $hash;
 	}
 
 	//Validate user data input
@@ -102,7 +135,7 @@ class User {
 	}
 
 	public function isLoggedIn() {
-		
+		return FALSE;
 	}
 
 	//Get name from user id
@@ -133,28 +166,30 @@ class User {
 	}
 
 	public function userExists($name = NULL, $email = NULL) {
-		$name_exists = NULL;
-		$email_exists = NULL;
+		$user_exists = [];
 
+		//Check if username already exists
+		$stmt = $this->dbh->prepare("SELECT COUNT(*) AS num FROM users WHERE name = :name");
 		if ($name) {
-			$stmt = $this->dbh->prepare("SELECT COUNT(*) AS num FROM users WHERE name = :name");
+			$stmt->bindParam(':name', $name);
+			
+		} else {
 			$stmt->bindParam(':name', $this->name);
-			$stmt->execute();
-			$result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-			$name_exists = $result['num'];
 		}
+		$stmt->execute();
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		$user_exists['name'] = $result['num'];
 
+		//Check if email already exists
+		$stmt = $this->dbh->prepare("SELECT COUNT(*) AS num FROM users WHERE email = :email");
 		if ($email) {
-			$stmt = $this->dbh->prepare("SELECT COUNT(*) AS num FROM users WHERE email = :email");
+			$stmt->bindParam(':email', $email);
+		} else {
 			$stmt->bindParam(':email', $this->email);
-			$stmt->execute();
-			$result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-			$email_exists = $result['num'];
 		}
-
-		$user_exists = array('name' => $name_exists, 'email' => $email_exists);
+		$stmt->execute();
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		$user_exists['email'] = $result['num'];
 
 		return $user_exists;
 	}

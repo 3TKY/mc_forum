@@ -21,19 +21,5 @@ class Functions {
 			return $elapsed . $units[$unit] . ' ago';
 		}
 	}
-
-	function getSalt() {
-		$rand = str_replace('+', 'x', base64_encode(mcrypt_create_iv(22,MCRYPT_DEV_URANDOM)));
-		$prefix = '$2a$07$';
-
-		$salt = $prefix . $rand . '$';
-	
-		return $salt;
-	}
-
-	function hashPassword($password, $salt) {
-		$hash = crypt($password, $salt);
-		return $hash;
-	}
 }
 ?>

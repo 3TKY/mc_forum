@@ -1,3 +1,4 @@
+<pre>
 <?php
 require_once('includes/init.php');
 
@@ -18,3 +19,4 @@ $user->email = $email;
 
 echo $user->register();
 ?>
+</pre>
