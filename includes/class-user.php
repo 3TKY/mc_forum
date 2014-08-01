@@ -2,7 +2,6 @@
 class User {
 	private $config;
 	private $dbh;
-	private $functions;
 
 	public $name;
 	public $password;
@@ -12,50 +11,82 @@ class User {
 	private $password_hashed;
 
 	public function register() {
-		//Error array
+		//Response data arrays
 		$e = [];
-		$user_exists = $this->userExists($this->name, $this->email);
+		$d = [];
+		$s = FALSE;
 
-		//Check if unique index user data already exists
-		if (!$user_exists['name'] && !$user_exists['email']) {
-			$input_valid = $this->validateUser($this->name, $this->email, $this->password);
+		$d['username'] = $this->name;
+		$d['email'] = $this->email;
+
+		//Check if all fields have been used
+		if (strlen($this->name) && strlen($this->password) && strlen($this->email)) {
+			$user_exists = $this->userExists($this->name, $this->email);
+
+			//Check if unique index user data already exists
+			if (!$user_exists['name'] && !$user_exists['email']) {
+				$input_valid = $this->validateUser($this->name, $this->email, $this->password);
 			
-			//Validate register form input
-			if($input_valid['name'] && $input_valid['email'] && $input_valid['password']) {
-				//Hash password for secure storage
-				$salt = $this->getSalt();
-				$this->password_hashed = $this->hashPassword($this->password, $salt);
+				//Validate register form input
+				if($input_valid['name'] && $input_valid['email'] && $input_valid['password']) {
+					//Hash password for secure storage
+					$salt = $this->getSalt();
+					$this->password_hashed = $this->hashPassword($this->password, $salt);
 
-				//Inser user database record
-				$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
-				$stmt->bindParam(':name', $this->name);
-				$stmt->bindParam(':password', $this->password_hashed);
-				$stmt->bindParam(':email', $this->email);
-				$stmt->execute();
+					//Inser user database record
+					$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
+					$stmt->bindParam(':name', $this->name);
+					$stmt->bindParam(':password', $this->password_hashed);
+					$stmt->bindParam(':email', $this->email);
+					$stmt->execute();
 
-				echo 'User registered:' . print_r($this);
+					$s = TRUE;
+				} else {
+					if (!$input_valid['name']) {
+						//Invalid username error
+						$e[] = "Your username may only be 16 characters long and may only consist of alphanumerical characters and '_'";
+					}
+					if (!$input_valid['email']) {
+						//Invalid email error
+						$e[] = "This is not a valid email adress";
+					}
+					if (!$input_valid['password']) {
+						//Invalid password error
+						$e[] = "Your password should be at least 6 characters long and should contain 2 numbers, 2 lowercase and 2 capital letters";
+					}
+				}
 			} else {
-				if (!$input_valid['name']) {
-					//Invalid name error
+				if ($user_exists['name']) {
+					//Name already exists error
+					$e[] = "This username is already in use";
 				}
-				if (!$input_valid['email']) {
-					//Invalid email error
-				}
-				if (!$input_valid['password']) {
-					//Invalid password error
+				if ($user_exists['email']) {
+					//Email already exists error
+					$e[] = "This email adress is already in use";
 				}
 			}
 		} else {
-			if ($user_exists['name']) {
-				//Name already exists error
+			if (!strlen($this->name)) {
+				//No username specified error
+				$e[] = "You didn't pick a username yet";
 			}
-			if ($user_exists['email']) {
-				//Email already exists error
+			if (!strlen($this->email)) {
+				//No username specified error
+				$e[] = "Your email adress cannot be empty";
+			}
+			if (!strlen($this->password)) {
+				//No username specified error
+				$e[] = "You forgot to specify a password";
 			}
 		}
 		
 		//Output JSON response
-		return $response = 'JSON';
+		$function_response = [];
+		$function_response['errors'] = $e;
+		$function_response['success'] = $s;
+		$function_response['data'] = $d;
+		
+		return json_encode($function_response);
 	}
 
 	public function login() {
@@ -66,6 +97,8 @@ class User {
 		} elseif ($this->checkCredentials($this->name, $this->password)) {
 			//Login
 			echo 'login';
+
+
 		} elseif (!$this->name || $this->password) {
 			echo 'nodata';
 		} else {
