@@ -101,29 +101,39 @@ class User {
 
 		$d['username'] = $this->name;
 		$d['email'] = $this->email;
+		$d['id'] = $this->user_id;
 
-		if ($this->isLoggedIn()) {
-			//User was already logged in
+		if ((!strlen($this->name) && !strlen($this->email)) || !strlen($this->password)) {
+			//No input data for login form
+			$e[] = 'You need to fill in all the fields';
 		} elseif ($this->checkCredentials($this->name, $this->password) || $this->checkCredentials($this->email, $this->password)) {
+			$this->getId();
+			$d['id'] = $this->user_id;
+
 			//Login
-			//DEV get user id
+			$_SESSION['logged_in'] = TRUE;
 
-			$stmt = $this->dbh->prepare("INSERT INTO users (last_login) VALUES (:last_login) WHERE id = :user_id");
-			$stmt->bindParam(':last_login', time());
-			$stmt->bindParam(':user_id', $user_id);
-			$stmt->execute();
+			$this->setLastLogin();
+			$d['time'] = $this->last_login;
 
-			echo 'login';
-		} elseif (!$this->name || $this->password) {
-			echo 'nodata';
+			$s = TRUE;
 		} else {
 			//Wrong username or password error
-			echo 'error';
+			$e[] = 'Wrong combination of username and password';
 		}
+
+		//Output JSON response
+		$function_response = [];
+		$function_response['errors'] = $e;
+		$function_response['success'] = $s;
+		$function_response['data'] = $d;
+		
+		return json_encode($function_response);
 	}
 
 	public function logout() {
-		$this->logged_in = 0;
+		echo 'logout';
+		$_SESSION['logged_in'] = FALSE;
 	}
 
 	//Delete a user
@@ -138,7 +148,9 @@ class User {
 
 	/* CLASS DATA FUNCTIONS */
 	public function isLoggedIn() {
-		return FALSE;
+		if ($_SESSION['logged_in']) {
+			return TRUE;
+		}
 	}
 
 	//Get name from user id
@@ -163,9 +175,9 @@ class User {
 		$stmt->execute();
 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-		$this->name = $result['name'];
+		$this->user_id = $result['id'];
 
-		return $this->name;
+		return $this->user_id;
 	}
 
 	public function getLastLogin() {
@@ -178,6 +190,19 @@ class User {
 			$this->last_login = $result['last_login'];
 
 			return $this->last_login;
+		}
+	}
+
+	public function setLastLogin() {
+		if ($this->user_id) {
+			$time = time();
+
+			$stmt = $this->dbh->prepare("UPDATE users SET last_login = :last_login WHERE id = :user_id");
+			$stmt->bindParam(':last_login', $time);
+			$stmt->bindParam(':user_id', $this->user_id);
+			$stmt->execute();
+
+			$this->last_login = $time;
 		}
 	}
 
