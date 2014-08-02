@@ -1,15 +1,20 @@
 <?php
 class User {
+	/* GLOBAL CLASS VARIABLES */
 	private $config;
 	private $dbh;
 
 	public $name;
-	public $password;
 	public $email;
+
 	private $user_id;
+
 	private $last_login;
+
+	public $password;
 	private $password_hashed;
 
+	/* MAIN FUNCTIONS */
 	public function register() {
 		//Response data arrays
 		$e = [];
@@ -30,7 +35,7 @@ class User {
 				//Validate register form input
 				if($input_valid['name'] && $input_valid['email'] && $input_valid['password']) {
 					//Hash password for secure storage
-					$salt = $this->getSalt();
+					$salt = $this->createSalt();
 					$this->password_hashed = $this->hashPassword($this->password, $salt);
 
 					//Inser user database record
@@ -76,7 +81,7 @@ class User {
 			}
 			if (!strlen($this->password)) {
 				//No username specified error
-				$e[] = "You forgot to specify a password";
+				$e[] = "You need a password to keep your account secure";
 			}
 		}
 		
@@ -90,20 +95,30 @@ class User {
 	}
 
 	public function login() {
-		return $this->checkCredentials($this->name, $this->password);
-		return $this->checkCredentials($this->email, $this->password);
+		$e = [];
+		$d = [];
+		$s = FALSE;
+
+		$d['username'] = $this->name;
+		$d['email'] = $this->email;
+
 		if ($this->isLoggedIn()) {
 			//User was already logged in
-		} elseif ($this->checkCredentials($this->name, $this->password)) {
+		} elseif ($this->checkCredentials($this->name, $this->password) || $this->checkCredentials($this->email, $this->password)) {
 			//Login
+			//DEV get user id
+
+			$stmt = $this->dbh->prepare("INSERT INTO users (last_login) VALUES (:last_login) WHERE id = :user_id");
+			$stmt->bindParam(':last_login', time());
+			$stmt->bindParam(':user_id', $user_id);
+			$stmt->execute();
+
 			echo 'login';
-
-
 		} elseif (!$this->name || $this->password) {
 			echo 'nodata';
 		} else {
 			//Wrong username or password error
-			'error';
+			echo 'error';
 		}
 	}
 
@@ -121,52 +136,7 @@ class User {
 		
 	}
 
-	private function checkCredentials($identifier, $password) {
-		$stmt = $this->dbh->prepare("SELECT password FROM users WHERE name = :name OR email = :email");
-		$stmt->bindParam(':name', $identifier);
-		$stmt->bindParam(':email', $identifier);
-		$stmt->execute();
-		$result = $stmt->fetch(PDO::FETCH_ASSOC);
-		
-		$hash = $result['password'];
-
-		$password_hashed = $this->hashPassword($password, $hash);
-
-		if ($password_hashed == $hash) {
-			//Correct username or password
-			return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	private function getSalt() {
-		$rand = str_replace('+', 'x', base64_encode(mcrypt_create_iv(32,MCRYPT_DEV_URANDOM)));
-		$prefix = '$2a$07$';
-
-		$salt = $prefix . $rand . '$';
-	
-		return $salt;
-	}
-
-	private function hashPassword($password, $salt) {
-		$hash = crypt($password, $salt);
-		return $hash;
-	}
-
-	//Validate user data input
-	private function validateUser($name, $email, $password) {
-		$email_valid = filter_var($email, FILTER_VALIDATE_EMAIL);
-
-		$name_valid = preg_match('/^[a-zA-Z0-9_]{1,16}$/', $name);
-
-		$password_valid = preg_match('/^(?=.*[A-Z].*[A-Z])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z]).{6,}$/', $password);
-
-		$input_valid = array('name' => $name_valid, 'email' => $email_valid, 'password' => $password_valid);
-
-		return $input_valid;
-	}
-
+	/* CLASS DATA FUNCTIONS */
 	public function isLoggedIn() {
 		return FALSE;
 	}
@@ -185,6 +155,19 @@ class User {
 		}
 	}
 
+	//Dev
+	public function getId() {
+		$stmt = $this->dbh->prepare("SELECT id FROM users WHERE name = :name OR email = :email");
+		$stmt->bindParam(':name', $this->name);
+		$stmt->bindParam(':email', $this->email);
+		$stmt->execute();
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+		$this->name = $result['name'];
+
+		return $this->name;
+	}
+
 	public function getLastLogin() {
 		if ($this->user_id) {
 			$stmt = $this->dbh->prepare("SELECT last_login FROM users WHERE id = :user_id");
@@ -198,6 +181,7 @@ class User {
 		}
 	}
 
+	/* SUPPORT FUNCTIONS */
 	public function userExists($name = NULL, $email = NULL) {
 		$user_exists = [];
 
@@ -227,6 +211,53 @@ class User {
 		return $user_exists;
 	}
 
+	private function checkCredentials($identifier, $password) {
+		$stmt = $this->dbh->prepare("SELECT password FROM users WHERE name = :name OR email = :email");
+		$stmt->bindParam(':name', $identifier);
+		$stmt->bindParam(':email', $identifier);
+		$stmt->execute();
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		
+		$hash = $result['password'];
+
+		$password_hashed = $this->hashPassword($password, $hash);
+
+		if ($password_hashed == $hash) {
+			//Correct username or password
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
+	private function createSalt() {
+		$rand = str_replace('+', 'x', base64_encode(mcrypt_create_iv(32,MCRYPT_DEV_URANDOM)));
+		$prefix = '$2a$07$';
+
+		$salt = $prefix . $rand . '$';
+	
+		return $salt;
+	}
+
+	private function hashPassword($password, $salt) {
+		$hash = crypt($password, $salt);
+		return $hash;
+	}
+
+	//Validate user data input
+	private function validateUser($name, $email, $password) {
+		$email_valid = filter_var($email, FILTER_VALIDATE_EMAIL);
+
+		$name_valid = preg_match('/^[a-zA-Z0-9_]{1,16}$/', $name);
+
+		$password_valid = preg_match('/^(?=.*[A-Z].*[A-Z])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z]).{6,}$/', $password);
+
+		$input_valid = array('name' => $name_valid, 'email' => $email_valid, 'password' => $password_valid);
+
+		return $input_valid;
+	}
+
+	/* CLASS FUNCTIONS */
 	public function __construct(Config $config, PDO $dbh, $user_id = NULL) {
 		$this->config = $config;
 		$this->dbh = $dbh;

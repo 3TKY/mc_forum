@@ -1,8 +1,10 @@
 <?php
 class Post {
+	/* GLOBAL CLASS VARIABLES */
 	private $dbh;
 	private $config;
 
+	/* MAIN FUNCTIONS */
 	public function create() {
 		
 	}
@@ -23,6 +25,7 @@ class Post {
 		
 	}
 
+	/* CLASS FUNCTIONS */
 	public function __construct(Config $config, PDO $dbh) {
 		$this->config = $config;
 		$this->dbh = $dbh;
