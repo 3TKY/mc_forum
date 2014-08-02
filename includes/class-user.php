@@ -103,7 +103,7 @@ class User {
 		$d['email'] = $this->email;
 		$d['id'] = $this->user_id;
 
-		if ((!strlen($this->name) && !strlen($this->email)) || !strlen($this->password)) {
+		dif ((!strlen($this->name) && !strlen($this->email)) || !strlen($this->password)) {
 			//No input data for login form
 			$e[] = 'You need to fill in all the fields';
 		} elseif ($this->checkCredentials($this->name, $this->password) || $this->checkCredentials($this->email, $this->password)) {
@@ -136,16 +136,6 @@ class User {
 		$_SESSION['logged_in'] = FALSE;
 	}
 
-	//Delete a user
-	public function delete($user_id) {
-		
-	}
-
-	//Ban user for violation of rules
-	public function ban($reason, $duration) {
-		
-	}
-
 	/* CLASS DATA FUNCTIONS */
 	public function isLoggedIn() {
 		if ($_SESSION['logged_in']) {
@@ -167,7 +157,7 @@ class User {
 		}
 	}
 
-	//Dev
+	//Ged id from user name or email
 	public function getId() {
 		$stmt = $this->dbh->prepare("SELECT id FROM users WHERE name = :name OR email = :email");
 		$stmt->bindParam(':name', $this->name);
