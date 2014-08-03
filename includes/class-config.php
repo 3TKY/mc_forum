@@ -29,21 +29,27 @@ class Config {
 		}
 	}
 
-	public function getLanguage() {
+	public function language() {
 		$setting = 'forum_language';
 		$default = 'en';
 		return $this->getSetting($setting, $default);
 	}
 
-	public function getTitle() {
+	public function title() {
 		$setting = 'forum_title';
 		$default = 'Untitled';
 		return $this->getSetting($setting, $default) . ' - Miniboard';
 	}
 
-	public function getCharset() {
+	public function charset() {
 		$setting = 'forum_charset';
 		$default = 'utf-8';
+		return $this->getSetting($setting, $default);
+	}
+
+	public function initialPostNum() {
+		$setting = 'forum_init_posts';
+		$default = 15;
 		return $this->getSetting($setting, $default);
 	}
 

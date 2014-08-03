@@ -6,8 +6,7 @@ class User {
 
 	public $name;
 	public $email;
-
-	private $user_id;
+	public $user_id;
 
 	private $last_login;
 
@@ -103,7 +102,7 @@ class User {
 		$d['email'] = $this->email;
 		$d['id'] = $this->user_id;
 
-		dif ((!strlen($this->name) && !strlen($this->email)) || !strlen($this->password)) {
+		if ((!strlen($this->name) && !strlen($this->email)) || !strlen($this->password)) {
 			//No input data for login form
 			$e[] = 'You need to fill in all the fields';
 		} elseif ($this->checkCredentials($this->name, $this->password) || $this->checkCredentials($this->email, $this->password)) {
@@ -111,7 +110,8 @@ class User {
 			$d['id'] = $this->user_id;
 
 			//Login
-			$_SESSION['logged_in'] = TRUE;
+			$_SESSION['login']['logged_in'] = TRUE;
+			$_SESSION['login']['user_id'] = $this->user_id;
 
 			$this->setLastLogin();
 			$d['time'] = $this->last_login;
@@ -132,15 +132,16 @@ class User {
 	}
 
 	public function logout() {
-		echo 'logout';
-		$_SESSION['logged_in'] = FALSE;
+		unset($_SESSION['login']);
 	}
 
 	/* CLASS DATA FUNCTIONS */
 	public function isLoggedIn() {
-		if ($_SESSION['logged_in']) {
+		if (isset($_SESSION['login']['logged_in'])) {
 			return TRUE;
 		}
+		
+		return FALSE;
 	}
 
 	//Get name from user id
@@ -181,6 +182,8 @@ class User {
 
 			return $this->last_login;
 		}
+
+		return NULL;
 	}
 
 	public function setLastLogin() {
@@ -273,10 +276,9 @@ class User {
 	}
 
 	/* CLASS FUNCTIONS */
-	public function __construct(Config $config, PDO $dbh, $user_id = NULL) {
+	public function __construct(Config $config = NULL, PDO $dbh = NULL) {
 		$this->config = $config;
 		$this->dbh = $dbh;
-		$this->user_id = $user_id;
 	}
 }
 ?>
