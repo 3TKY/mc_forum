@@ -11,6 +11,14 @@ if ($_SERVER['REQUEST_METHOD'] == "GET"){
 	$author = new User($config, $dbh);
 	$post = new Post ($config, $dbh, $author);
 
-	$post->create();
+	if(isset($_GET['content'])) {
+		$content = $_GET['content'];
+	} else {
+		$content = '';
+	}
+
+	$post->setContent($content);
+
+	echo $post->create();
 }
 ?>

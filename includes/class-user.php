@@ -4,14 +4,8 @@ class User {
 	private $config;
 	private $dbh;
 
-	public $name;
-	public $email;
-	public $user_id;
-
-	private $last_login;
-
-	public $password;
-	private $password_hashed;
+	public $name, $email, $user_id, $password;
+	private $last_login,  $password_hashed;
 
 	/* MAIN FUNCTIONS */
 	public function register() {
@@ -48,7 +42,7 @@ class User {
 				} else {
 					if (!$input_valid['name']) {
 						//Invalid username error
-						$e[] = "Your username may only be 16 characters long and may only consist of alphanumerical characters and '_'";
+						$e[] = "Your username may only be 16 characters long and can only consist of alphanumerical characters and '_'";
 					}
 					if (!$input_valid['email']) {
 						//Invalid email error
@@ -56,7 +50,7 @@ class User {
 					}
 					if (!$input_valid['password']) {
 						//Invalid password error
-						$e[] = "Your password should be at least 6 characters long and should contain 2 numbers, 2 lowercase and 2 capital letters";
+						$e[] = "Your password should be at least 6 characters long, contain 2 numbers, 2 lowercase and 2 capital letters";
 					}
 				}
 			} else {
