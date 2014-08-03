@@ -20,7 +20,13 @@ class Post {
 			if (strlen($this->content)) {
 				$this->author->user_id = $_SESSION['user_id'];
 				
-				$stmt = $this->dbh->prepare("INSERT INTO posts (author, content, user_id, time) VALUES ()");
+				//Insert post in table
+				$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
+				$stmt = $this->dbh->prepare("INSERT INTO posts (user_id, content, time) VALUES (:author, :content, :time)");
+				$stmt->bindParam(':author', $this->author->user_id, PDO::PARAM_INT);
+				$stmt->bindParam(':content', $this->content);
+				$stmt->bindParam(':time', time(), PDO::PARAM_INT);
+				$stmt->execute();
 
 				$s = TRUE;
 			} else {
