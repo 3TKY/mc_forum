@@ -133,6 +133,10 @@ class User {
 
 	public function logout() {
 		unset($_SESSION['login']);
+		$function_response = [];
+		$function_response['success'] = TRUE;
+
+		return json_encode($function_response);
 	}
 
 	/* CLASS DATA FUNCTIONS */
