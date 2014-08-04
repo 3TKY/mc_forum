@@ -1,10 +1,7 @@
 <?php
 class Post {
 	/* GLOBAL CLASS VARIABLES */
-	private $dbh;
-	private $config;
-
-	private $author;
+	private $dbh, $config, $author;
 
 	public $content;
 
@@ -18,10 +15,10 @@ class Post {
 
 		if ($this->author->isLoggedIn()) {
 			if (strlen($this->content)) {
-				$this->author->user_id = $_SESSION['user_id'];
+				//Get user id from login session
+				$this->author->user_id = $_SESSION['login']['user_id'];
 				
 				//Insert post in table
-				$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
 				$stmt = $this->dbh->prepare("INSERT INTO posts (user_id, content, time) VALUES (:author, :content, :time)");
 				$stmt->bindParam(':author', $this->author->user_id, PDO::PARAM_INT);
 				$stmt->bindParam(':content', $this->content);
@@ -37,6 +34,7 @@ class Post {
 			$e[] = 'You need to login to create a post';
 		}
 
+		//Output JSON response
 		$function_response = [];
 		$function_response['errors'] = $e;
 		$function_response['success'] = $s;

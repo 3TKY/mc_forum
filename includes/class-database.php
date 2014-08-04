@@ -1,7 +1,6 @@
 <?php
 class Database {
-	private $dbh;
-	private $config;
+	private $dbh, $config;
 
 	public function connect() {
 		$db_settings = $this->config->getDatabaseConf();

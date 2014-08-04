@@ -1,9 +1,7 @@
 <?php
 class User {
 	/* GLOBAL CLASS VARIABLES */
-	private $config;
-	private $dbh;
-
+	private $config, $dbh;
 	public $name, $email, $user_id, $password;
 	private $last_login,  $password_hashed;
 

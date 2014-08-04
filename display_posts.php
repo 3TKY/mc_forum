@@ -14,5 +14,9 @@ $post = new Post ($config, $dbh, $author);
 
 $forum = new Forum ($config, $dbh, $post);
 
-$forum->getPosts();
+if (1==2) {
+	
+} else {
+	$forum->getPosts();
+}
 ?>
