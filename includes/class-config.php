@@ -47,8 +47,8 @@ class Config {
 		return $this->getSetting($setting, $default);
 	}
 
-	public function initialPostNum() {
-		$setting = 'forum_init_posts';
+	public function defaultTopicCount() {
+		$setting = 'forum_default_topic_count';
 		$default = 15;
 		return $this->getSetting($setting, $default);
 	}
