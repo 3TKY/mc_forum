@@ -10,9 +10,7 @@ $dbh = $db->connect();
 
 $author = new User($config, $dbh);
 
-$post = new Post ($config, $dbh, $author);
-
-$forum = new Forum ($config, $dbh, $post);
+$forum = new Forum ($config, $dbh);
 
 $cursor = NULL;
 if (isset($_GET['cursor'])) {

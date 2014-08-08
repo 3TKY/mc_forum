@@ -94,10 +94,9 @@ class Forum {
 	}
 
 	/* CLASS FUNCTIONS */
-	public function __construct(Config $config = NULL, PDO $dbh = NULL, Post $post) {
+	public function __construct(Config $config = NULL, PDO $dbh = NULL) {
 		$this->config = $config;
 		$this->dbh = $dbh;
-		$this->post = $post;
 	}
 }
 ?>
