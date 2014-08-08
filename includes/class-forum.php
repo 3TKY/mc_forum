@@ -76,7 +76,6 @@ class Forum {
 					) AS t2
 					)
 				), id DESC
-
 				LIMIT :cursor, :topic_count
 
 			");

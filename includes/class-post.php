@@ -48,7 +48,7 @@ class Post {
 		return json_encode($function_response);
 	}
 
-	public function render() {
+	public function display() {
 		
 	}
 
