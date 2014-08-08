@@ -3,17 +3,17 @@ class Forum {
 	private $config, $dbh, $post;
 
 	/* MAIN FUNCTIONS */
-	public function getPosts($first = NULL, $last = NULL, $num = NULL, $browse_type = NULL) {
-		$function_response = [];
-		$browse_type = strtolower($browse_type);
+	public function getTopics($cursor = 0, $browse_mode = NULL, $count = NULL) {
+		$d = [];
 
-		if (!$num) {
-			$num = $this->config->defaultTopicCount();
+		$browse_mode = strtolower($browse_mode);
+
+		//Set topic count number to default if left empty
+		if (!$count) {
+			$count = $this->config->defaultTopicCount();
 		}
 
-		echo $num;
-
-		if ($browse_type == 'popularity') {
+		if ($browse_mode == 'popularity') {
 			//Order by most replies on opening post
 			$stmt = $this->dbh->prepare("
 
@@ -27,10 +27,10 @@ class Forum {
 				ON posts.id = r.topic_id
 				WHERE op_id IS NULL
 				ORDER BY r.replies DESC, time DESC, id DESC
-				LIMIT :topic_count
+				LIMIT :cursor, :topic_count
 
 			");
-		} else if ($browse_type == 'start') {
+		} else if ($browse_mode == 'start') {
 			//Order by opening date of post
 			$stmt = $this->dbh->prepare("
 				
@@ -44,7 +44,7 @@ class Forum {
 				ON posts.id = r.topic_id
 				WHERE op_id IS NULL
 				ORDER BY time DESC, id DESC
-				LIMIT :topic_count
+				LIMIT :cursor, :topic_count
 
 			");
 		} else {
@@ -76,15 +76,20 @@ class Forum {
 					) AS t2
 					)
 				), id DESC
-				LIMIT :topic_count
+
+				LIMIT :cursor, :topic_count
 
 			");
 		}
-		$stmt->bindParam(':topic_count', intval($num), PDO::PARAM_INT);
+		$stmt->bindParam(':cursor', intval($cursor), PDO::PARAM_INT);
+		$stmt->bindParam(':topic_count', intval($count), PDO::PARAM_INT);
 		$stmt->execute();
 		$topics = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-		print_r($topics);
+		$d['topic_count'] = count($topics);
+		$d['topics'] = $topics;
+
+		$function_response['data'] = $d;
 
 		return json_encode($function_response);
 	}

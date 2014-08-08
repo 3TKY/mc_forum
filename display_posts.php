@@ -14,9 +14,20 @@ $post = new Post ($config, $dbh, $author);
 
 $forum = new Forum ($config, $dbh, $post);
 
-if (1==2) {
-	
-} else {
-	echo $forum->getPosts();
+$cursor = NULL;
+if (isset($_GET['cursor'])) {
+	$cursor = $_GET['cursor'];
 }
+
+$browse_mode = NULL;
+if (isset($_GET['browse_mode'])) {
+	$browse_mode = $_GET['browse_mode'];
+}
+
+$count = NULL;
+if (isset($_GET['count'])) {
+	$count = $_GET['count'];
+}
+
+echo $forum->getTopics($cursor, $browse_mode, $count);
 ?>
