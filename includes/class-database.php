@@ -14,7 +14,7 @@ class Database {
 			$dbh = new PDO('mysql:host=' . $db_host . ';dbname=' . $db_name, $db_user, $db_password);
 			return $dbh;
 		} catch (Exception $e) {
-			error_log($e->getMessage());
+			echo $e->getMessage();
 		}
 	}
 

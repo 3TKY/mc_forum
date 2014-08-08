@@ -19,7 +19,12 @@ class Post {
 				$this->author->user_id = $_SESSION['login']['user_id'];
 				
 				//Insert post in table
-				$stmt = $this->dbh->prepare("INSERT INTO posts (user_id, content, time) VALUES (:author, :content, :time)");
+				$stmt = $this->dbh->prepare("
+				
+					INSERT INTO posts (user_id, content, time)
+					VALUES (:author, :content, :time)
+				
+				");
 				$stmt->bindParam(':author', $this->author->user_id, PDO::PARAM_INT);
 				$stmt->bindParam(':content', $this->content);
 				$stmt->bindParam(':time', time(), PDO::PARAM_INT);
@@ -45,7 +50,6 @@ class Post {
 
 	public function render() {
 		
-
 	}
 
 	public function delete() {

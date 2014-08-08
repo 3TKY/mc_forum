@@ -30,7 +30,12 @@ class User {
 					$this->password_hashed = $this->hashPassword($this->password, $salt);
 
 					//Inser user database record
-					$stmt = $this->dbh->prepare("INSERT INTO users (name, password, email) VALUES (:name, :password, :email)");
+					$stmt = $this->dbh->prepare("
+					
+						INSERT INTO users (name, password, email)
+						VALUES (:name, :password, :email)
+					
+					");
 					$stmt->bindParam(':name', $this->name);
 					$stmt->bindParam(':password', $this->password_hashed);
 					$stmt->bindParam(':email', $this->email);
@@ -143,7 +148,12 @@ class User {
 	//Get name from user id
 	public function getName() {
 		if ($this->user_id) {
-			$stmt = $this->dbh->prepare("SELECT name FROM users WHERE id = :user_id");
+			$stmt = $this->dbh->prepare("
+				
+				SELECT name
+				FROM users WHERE id = :user_id
+			
+			");
 			$stmt->bindParam(':user_id', $this->user_id, PDO::PARAM_INT);
 			$stmt->execute();
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -156,7 +166,13 @@ class User {
 
 	//Ged id from user name or email
 	public function getId() {
-		$stmt = $this->dbh->prepare("SELECT id FROM users WHERE name = :name OR email = :email");
+		$stmt = $this->dbh->prepare("
+		
+			SELECT id
+			FROM users
+			WHERE name = :name OR email = :email
+			
+		");
 		$stmt->bindParam(':name', $this->name);
 		$stmt->bindParam(':email', $this->email);
 		$stmt->execute();
@@ -169,7 +185,12 @@ class User {
 
 	public function getLastLogin() {
 		if ($this->user_id) {
-			$stmt = $this->dbh->prepare("SELECT last_login FROM users WHERE id = :user_id");
+			$stmt = $this->dbh->prepare("
+			
+				SELECT last_login
+				FROM users WHERE id = :user_id
+				
+			");
 			$stmt->bindParam(':user_id', $this->user_id, PDO::PARAM_INT);
 			$stmt->execute();
 			$result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -186,7 +207,13 @@ class User {
 		if ($this->user_id) {
 			$time = time();
 
-			$stmt = $this->dbh->prepare("UPDATE users SET last_login = :last_login WHERE id = :user_id");
+			$stmt = $this->dbh->prepare("
+			
+				UPDATE users
+				SET last_login = :last_login
+				WHERE id = :user_id
+			
+			");
 			$stmt->bindParam(':last_login', $time);
 			$stmt->bindParam(':user_id', $this->user_id);
 			$stmt->execute();
@@ -200,7 +227,13 @@ class User {
 		$user_exists = [];
 
 		//Check if username already exists
-		$stmt = $this->dbh->prepare("SELECT COUNT(*) AS num FROM users WHERE name = :name");
+		$stmt = $this->dbh->prepare("
+		
+			SELECT COUNT(*) AS num 
+			FROM users
+			WHERE name = :name
+			
+		");
 		if ($name) {
 			$stmt->bindParam(':name', $name);
 			
@@ -212,7 +245,13 @@ class User {
 		$user_exists['name'] = $result['num'];
 
 		//Check if email already exists
-		$stmt = $this->dbh->prepare("SELECT COUNT(*) AS num FROM users WHERE email = :email");
+		$stmt = $this->dbh->prepare("
+
+			SELECT COUNT(*) AS num
+			FROM users
+			WHERE email = :email
+		
+		");
 		if ($email) {
 			$stmt->bindParam(':email', $email);
 		} else {
@@ -226,7 +265,13 @@ class User {
 	}
 
 	private function checkCredentials($identifier, $password) {
-		$stmt = $this->dbh->prepare("SELECT password FROM users WHERE name = :name OR email = :email");
+		$stmt = $this->dbh->prepare("
+
+			SELECT password
+			FROM users
+			WHERE name = :name OR email = :email
+		
+		");
 		$stmt->bindParam(':name', $identifier);
 		$stmt->bindParam(':email', $identifier);
 		$stmt->execute();

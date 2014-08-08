@@ -17,6 +17,6 @@ $forum = new Forum ($config, $dbh, $post);
 if (1==2) {
 	
 } else {
-	$forum->getPosts();
+	echo $forum->getPosts();
 }
 ?>
