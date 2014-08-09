@@ -1,0 +1,56 @@
+/*Reset style*/
+a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
+
+/*Document markup*/
+html, body {
+	height: 100%;
+}
+
+body {
+	background-color: #DAE7E4;
+	background-size: cover;
+}
+
+.page {
+	min-width: 368px;
+	max-width: 720px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 20px;
+}
+.top > .nav {
+	height: 96px;
+	background-color: #00CDA5;
+	overflow: hidden;
+}
+.top > .nav .item {
+	height: 96px;
+	width: 25%;
+	display: block;
+	float: left;
+	background-size: 48px 48px;
+	background-repeat: no-repeat;
+	background-position: center;
+	cursor: pointer;
+}
+.top > .nav .item:nth-child(even) {
+	background-color: #02c7a0;
+}
+.top > .nav .item:hover {
+	background-color: #00B893;
+}
+.top > .content .nav-arrow {
+	height: 18px;
+	width: 31px;
+	background-image: url('nav-arrow.png');
+	position: relative;
+	top: -18px;
+	left: 12.5%;
+	margin-left: -16px;
+	
+}
+.content {
+	background-color: #FFFFFF;
+	height: 96px;
+	margin-top: 8px;
+}
